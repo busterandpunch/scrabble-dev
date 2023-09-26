@@ -1,23 +1,48 @@
-<?php
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scrabble</title>
+</head>
+<body>
+    <h1>Scrabble</h1>
 
-use Src\Boot;
-use Src\Engine\Dictionary\Dictionary;
-use Src\Engine\Scrabble;
+    <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
+        <label for="rack">Enter your Scrabble tiles:</label>
+        <input type="text" name="rack" id="rack" required>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
 
-require_once 'Src/Boot.php';
+    <?php
+    use Src\Boot;
+    use Src\Engine\Dictionary\Dictionary;
+    use Src\Engine\Scrabble;
 
-$boot = new Boot();
+    require_once 'Src/Boot.php';
 
-$dictionary = new Dictionary($boot);
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $boot = new Boot();
+        $dictionary = new Dictionary($boot);
+        $scrabble = new Scrabble($dictionary);
 
-$scrabble = new Scrabble($dictionary);
+        // Get the rack input from the form
+        $rack = $_POST["rack"];
 
-$rack = "hjkhkaseiwiq";
-
-/**
- * Engine = $scrabble
- *
- * to run a match use the method matchInDictionary
- * this will return an array of words and scores
- */
-var_dump($scrabble->matchInDictionary($rack));
+        // Run the Scrabble match and display the results
+        $results = $scrabble->matchInDictionary($rack);
+        
+        // Display the results
+        echo "<h2>Results:</h2>";
+        if (empty($results)) {
+            echo "No valid words found for the given rack.";
+        } else {
+          $count=0;
+            foreach ($results as $word => $score) {
+              $count++;
+                echo "<p>$count - Word: $word, Score: $score</p>";
+            }
+        }
+    }
+    ?>
+</body>
+</html>
